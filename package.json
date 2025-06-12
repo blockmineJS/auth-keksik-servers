@@ -1,0 +1,20 @@
+{
+    "name": "auth-keksik-servers",
+    "version": "1.0.0",
+    "description": "Плагин для автоматической регистрации/авторизации и захода на портал на серверах MineBlaze, MasedWorld, DexLand, CheatMine",
+    "main": "index.js",
+    "botpanel": {
+      "supportedHosts": [
+        "mc.mineblaze.net",
+        "mc.masedworld.net"
+      ],
+      "settings": {
+        "portalNumber": {
+          "type": "number",
+          "label": "Номер портала",
+          "description": "Портал, на который нужно зайти после успешной авторизации (например, 1, 2, 3...).",
+          "default": 1
+        }
+      }
+    }
+  }
