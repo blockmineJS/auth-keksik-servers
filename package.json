@@ -1,6 +1,6 @@
 {
     "name": "auth-keksik-servers",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Плагин для автоматической регистрации/авторизации и захода на портал на серверах MineBlaze, MasedWorld, DexLand, CheatMine",
     "main": "index.js",
     "botpanel": {
