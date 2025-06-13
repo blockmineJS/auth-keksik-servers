@@ -67,7 +67,7 @@
 module.exports = (bot, options) => {
     bot.events.on('auth:portal_joined', (data) => {
         bot.sendLog(`Успешно зашли на портал #${data.portal} на сервере ${data.server}!`);
-        // Ваша логика здесь...
+        // ну идальше что надо
     });
 };
 ```
