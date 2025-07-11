@@ -1,21 +1,33 @@
 {
-    "name": "auth-keksik-servers",
-    "version": "1.0.6",
-    "author": "FurnyGo",
-    "description": "Плагин для автоматической регистрации/авторизации и захода на портал на серверах MineBlaze, MasedWorld, DexLand, CheatMine",
-    "main": "index.js",
-    "botpanel": {
-      "supportedHosts": [
-        "mc.mineblaze.net",
-        "mc.masedworld.net"
-      ],
-      "settings": {
-        "portalNumber": {
-          "type": "number",
-          "label": "Номер портала",
-          "description": "Портал, на который нужно зайти после успешной авторизации (например, 1, 2, 3...).",
-          "default": 1
-        }
+  "name": "auth-keksik-servers",
+  "version": "1.0.7",
+  "author": "FurnyGo",
+  "description": "Плагин для автоматической регистрации/авторизации и захода на портал на серверах MineBlaze, MasedWorld, DexLand, CheatMine",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/blockmineJS/auth-keksik-servers.git"
+  },
+  "botpanel": {
+    "supportedHosts": [
+      "mc.mineblaze.net",
+      "mc.masedworld.net",
+      "mc.dexland.org",
+      "mc.cheatmine.net"
+    ],
+    "settings": {
+      "hubCmd": {
+        "type": "string",
+        "label": "Команда, прописываемая в хабе",
+        "description": "Команда, которая будет прописана после попадания в хаб (например, /s1, /s2, /g1...).",
+        "default": "/s1"
+      },
+      "portalCmd": {
+        "type": "string",
+        "label": "Команда, прописываемая на режиме",
+        "description": "Команда, которая будет прописана после попадания на режим (например, !ку, /warp gm, /spawn...).",
+        "default": ""
       }
     }
   }
+}
