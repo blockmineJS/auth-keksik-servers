@@ -1,8 +1,10 @@
 module.exports = (bot, options) => {
     const password = bot.config.password;
-    const portalNumber = options.settings.portalNumber;
+    const server = bot.config.server.host;
+    const hubCmd = options.settings.hubCmd;
+    const portalCmd = options.settings.portalCmd;
     const log = bot.sendLog;
-
+    
     if (!password) {
         log('[AuthPlugin] Ошибка: Пароль не указан в настройках самого бота. Авторизация невозможна.');
         return;
@@ -16,11 +18,20 @@ module.exports = (bot, options) => {
 
     function getWorldType() {
         if (bot.game.difficulty === 'peaceful' && bot.game.levelType === 'flat') {
-            return bot.game.gameMode === 'adventure' ? 'Hub' : 'Auth';
-        } else if (bot.game.difficulty === 'easy' && bot.game.levelType === 'default') {
-            return 'Survival';
+            if (server.includes('mineblaze')) {
+                return bot.entity.position.y === 19 ? 'Auth' : 'Hub';
+            } else if (server.includes('masedworld')) {
+                return bot.entity.position.y === 50 ? 'Auth' : 'Hub';
+            } else if (server.includes('dexland')) {
+                return bot.entity.position.y === 100 ? 'Auth' : 'Hub';
+            } else if (server.includes('cheatmine')) {
+                return bot.entity.position.y === 59 ? 'Auth' : 'Hub';
+            } else {
+                return 'Unknown';
+            }
+        } else {
+            return 'Portal';
         }
-        return 'Unknown';
     }
 
     function cleanupListener() {
@@ -31,19 +42,36 @@ module.exports = (bot, options) => {
         }
     }
 
-    function goToPortal() {
-        if (portalNumber && portalNumber > 0) {
-            const portalCommand = `/s${portalNumber}`;
-            log(`[AuthPlugin] Перехожу на портал ${portalNumber}...`);
-            setTimeout(() => {
-                bot.api.sendMessage('command', portalCommand);
-                bot.events.emit('auth:portal_joined', { 
-                    portal: portalNumber,
-                    server: bot.config.server.host 
-                });
-                log(`[AuthPlugin] Сгенерировано событие 'auth:portal_joined' для портала ${portalNumber}.`);
-            }, 1500);
-        }
+    function inAuth() {
+        bot.events.emit('auth:auth_joined', {
+            server: server 
+        });
+        log(`[AuthPlugin] Сгенерировано событие 'auth:auth_joined': ${server}`);
+    }
+
+    function inHub() {
+        bot.events.emit('auth:hub_joined', {
+            server: server 
+        });
+        log(`[AuthPlugin] Сгенерировано событие 'auth:hub_joined': ${server}`);
+    }
+
+    function inPortal() {
+        bot.events.emit('auth:portal_joined', { 
+            command: hubCmd,
+            server: server 
+        });
+        log(`[AuthPlugin] Сгенерировано событие 'auth:portal_joined': ${hubCmd}, ${server}.`);
+    }
+
+    function doHubCmd() {
+        log(`[AuthPlugin] Прописываю ${hubCmd}...`);
+        bot.api.sendMessage('command', hubCmd);
+    }
+
+    function doPortalCmd() {
+        log(`[AuthPlugin] Прописываю ${portalCmd}...`);
+        bot.api.sendMessage('command', portalCmd);
     }
 
     const messageHandler = (rawMessageText) => {
@@ -59,9 +87,7 @@ module.exports = (bot, options) => {
 
         if (commandToSend) {
             log(`[AuthPlugin] Обнаружен запрос на аутентификацию. Отправка команды...`);
-            setTimeout(() => {
-                bot.api.sendMessage('command', commandToSend);
-            }, 2000);
+            bot.api.sendMessage('command', commandToSend);
             return;
         }
 
@@ -79,18 +105,33 @@ module.exports = (bot, options) => {
 
         switch (worldType) {
             case 'Hub':
-                log('[AuthPlugin] Обнаружен хаб. Бот уже авторизован. Перехожу на портал.');
-                goToPortal();
+                log('[AuthPlugin] Бот в хабе.');
+                inHub()
+                if (hubCmd) {
+                    log('[AuthPlugin] Пишем команду в хабе.');
+                    doHubCmd();
+                } else {
+                    log('[AuthPlugin] Никаких действий в хабе не требуется.');
+                }
                 break;
             
             case 'Auth':
-                log('[AuthPlugin] Обнаружен мир авторизации.');
+                log('[AuthPlugin] Бот на авторизации.');
+                inAuth();
                 messageListener = messageHandler;
                 bot.events.on('core:raw_message', messageListener);
                 break;
 
-            case 'Survival':
-                log('[AuthPlugin] Бот уже в игровом мире. Никаких действий не требуется.');
+            case 'Portal':
+                log('[AuthPlugin] Бот на режиме.');
+                inPortal()
+                if (portalCmd) {
+                    log('[AuthPlugin] Пишем команду на режиме.');
+                    doPortalCmd();
+                }
+                else {
+                    log('[AuthPlugin] Никаких действий на режиме не требуется.');
+                }
                 break;
 
             default:
