@@ -1,12 +1,12 @@
 {
   "name": "auth-keksik-servers",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "author": "FurnyGo",
   "description": "Плагин для автоматической регистрации/авторизации и захода на портал на серверах MineBlaze, MasedWorld, DexLand, CheatMine",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/blockmineJS/auth-keksik-servers.git"
+    "url": "https://github.com/blockmineJS/auth-keksik-servers"
   },
   "botpanel": {
     "supportedHosts": [

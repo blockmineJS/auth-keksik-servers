@@ -12,8 +12,8 @@ module.exports = (bot, options) => {
 
     let messageListener = null;
 
-    const loginPromptPattern = /^(?:\||›|◊)\s*(?:Авторизируйтесь|Введите пароль|Чтобы продолжить игру введите)/i;
-    const registerPromptPattern = /^(?:\||›|◊)\s*(?:Зарегистрируйтесь|Создайте пароль)/i;
+    const loginPromptPattern = /^(?:\n| )*(?:\||›|◊)\s*(?:Авторизируйтесь|Введите пароль|Чтобы продолжить игру введите)/i;
+    const registerPromptPattern = /^(?:\n| )*(?:\||›|◊)\s*(?:Зарегистрируйтесь|Создайте пароль)/i;
     const successPattern = /Вы успешно вошли|Успешная авторизация|Добро пожаловать|Привяжите аккаунт|Вы успешно зарегистрировались/i;
 
     function getWorldType() {
