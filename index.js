@@ -93,7 +93,7 @@ module.exports = (bot, options) => {
             }
 
             doHubCmd();
-        }, 1000);
+        }, 10000);
     }
 
     const messageHandler = (rawMessageText) => {
@@ -171,3 +171,4 @@ module.exports = (bot, options) => {
 
     log('[AuthPlugin] Плагин автоматической авторизации загружен и готов к работе.');
 };
+
