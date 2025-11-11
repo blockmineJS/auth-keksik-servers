@@ -60,8 +60,8 @@ module.exports = (bot, options) => {
 
     function inPortal() {
         bot.events.emit('auth:portal_joined', {
-            command: portalCmd,
-            server
+            command: hubCmd || null,
+            server: server
         });
     }
 
