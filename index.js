@@ -1,8 +1,11 @@
 module.exports = (bot, options) => {
     const password = bot.config.password;
     const server = bot.config.server.host;
+    
     const hubCmd = options.settings.hubCmd;
     const portalCmd = options.settings.portalCmd;
+    const hubIntervalSeconds = options.settings.hubInterval || 5;
+    
     const log = bot.sendLog;
 
     if (!password) {
@@ -83,6 +86,8 @@ module.exports = (bot, options) => {
 
         stopHubInterval();
 
+        const intervalTime = hubIntervalSeconds * 1000;
+
         hubInterval = setInterval(() => {
             const worldType = getWorldType();
 
@@ -93,7 +98,7 @@ module.exports = (bot, options) => {
             }
 
             doHubCmd();
-        }, 10000);
+        }, intervalTime);
     }
 
     const messageHandler = (rawMessageText) => {
@@ -169,6 +174,5 @@ module.exports = (bot, options) => {
         log('[AuthPlugin] Бот отключается, все ресурсы плагина очищены.');
     });
 
-    log('[AuthPlugin] Плагин автоматической авторизации загружен и готов к работе.');
+    log(`[AuthPlugin] Плагин загружен. Интервал хаба: ${hubIntervalSeconds} сек.`);
 };
-

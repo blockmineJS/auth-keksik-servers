@@ -1,6 +1,6 @@
 {
   "name": "auth-keksik-servers",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "author": "FurnyGo/merka",
   "description": "Плагин для автоматической регистрации/авторизации и захода на портал на серверах MineBlaze, MasedWorld, DexLand, CheatMine",
   "main": "index.js",
@@ -21,6 +21,12 @@
         "label": "Команда, прописываемая в хабе",
         "description": "Команда, которая будет прописана после попадания в хаб (например, /s1, /s2, /g1...).",
         "default": "/s1"
+      },
+      "hubInterval": {
+        "type": "number",
+        "label": "Интервал ввода команды в хабе (сек)",
+        "description": "Пауза между попытками ввода команды в хабе (в секундах).",
+        "default": 5
       },
       "portalCmd": {
         "type": "string",
