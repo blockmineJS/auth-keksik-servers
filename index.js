@@ -16,20 +16,35 @@ module.exports = (bot, options) => {
     let messageListener = null;
     let hubInterval = null;
 
-    const loginPromptPattern = /^(?:\n| )*(?:\||›|◊)\s*(?:Авторизируйтесь|Введите пароль|Чтобы продолжить игру введите)/i;
-    const registerPromptPattern = /^(?:\n| )*(?:\||›|◊)\s*(?:Зарегистрируйтесь|Создайте пароль)/i;
-    const successPattern = /Вы успешно вошли|Успешная авторизация|Добро пожаловать|Привяжите аккаунт|Вы успешно зарегистрировались/i;
+    const loginPromptPattern = /(?:\||›|◊|✾|\[✾\])\s*(?:Авторизируйтесь|Введите пароль|Войдите в игру|Чтобы продолжить игру введите)/i;
+    const registerPromptPattern = /(?:\||›|◊|✾|\[✾\])\s*(?:Зарегистрируйтесь|Создайте пароль)/i;
+    const successPattern = /Вы успешно вошли|Успешная авторизация|Добро пожаловать|Привяжите аккаунт|Вы успешно зарегистрировались|Успешная регистрация! Приятной игры|Успешная авторизация! Приятной игры/i;
 
     function getWorldType() {
-        if (bot.game.difficulty === 'peaceful' && bot.game.levelType === 'flat') {
+        const y = bot.entity.position.y;
+        const difficulty = bot.game.difficulty;
+        const levelType = bot.game.levelType;
+
+        if (server.toLowerCase().includes('funtime')) {
+            if (levelType === 'flat') {
+                if (y === 100) {
+                    return 'Hub';
+                }
+                return 'Unknown';
+            } else {
+                return 'Portal';
+            }
+        }
+
+        if (difficulty === 'peaceful' && levelType === 'flat') {
             if (server.includes('mineblaze')) {
-                return bot.entity.position.y === 19 ? 'Auth' : 'Hub';
+                return y === 19 ? 'Auth' : 'Hub';
             } else if (server.includes('masedworld')) {
-                return bot.entity.position.y === 50 ? 'Auth' : 'Hub';
+                return y === 50 ? 'Auth' : 'Hub';
             } else if (server.includes('dexland')) {
-                return bot.entity.position.y === 100 ? 'Auth' : 'Hub';
+                return y === 100 ? 'Auth' : 'Hub';
             } else if (server.includes('cheatmine')) {
-                return bot.entity.position.y === 59 ? 'Auth' : 'Hub';
+                return y === 59 ? 'Auth' : 'Hub';
             } else {
                 return 'Unknown';
             }
@@ -42,7 +57,6 @@ module.exports = (bot, options) => {
         if (messageListener) {
             bot.events.removeListener('core:raw_message', messageListener);
             messageListener = null;
-            log('[AuthPlugin] Слушатель сообщений авторизации отключен.');
         }
     }
 
@@ -69,10 +83,7 @@ module.exports = (bot, options) => {
     }
 
     function doHubCmd() {
-        if (!hubCmd) {
-            log('[AuthPlugin] hubCmd не задан, не могу отправлять команду из хаба.');
-            return;
-        }
+        if (!hubCmd) return;
         bot.api.sendMessage('command', hubCmd);
     }
 
@@ -93,12 +104,17 @@ module.exports = (bot, options) => {
 
             if (worldType !== 'Hub') {
                 stopHubInterval();
+                if (worldType === 'Portal') {
+                    log(`[AuthPlugin] Телепортация на портал!`);
+                }
                 handleWorldType(worldType);
                 return;
             }
 
             doHubCmd();
         }, intervalTime);
+
+        doHubCmd();
     }
 
     const messageHandler = (rawMessageText) => {
@@ -109,7 +125,11 @@ module.exports = (bot, options) => {
         if (loginPromptPattern.test(rawMessageText)) {
             commandToSend = `/login ${password}`;
         } else if (registerPromptPattern.test(rawMessageText)) {
-            commandToSend = `/reg ${password} ${password}`;
+            if (server.toLowerCase().includes('funtime')) {
+                commandToSend = `/reg ${password}`;
+            } else {
+                commandToSend = `/reg ${password} ${password}`;
+            }
         }
 
         if (commandToSend) {
@@ -118,40 +138,71 @@ module.exports = (bot, options) => {
         }
 
         if (successPattern.test(rawMessageText)) {
+            log('[AuthPlugin] Успешная авторизация!');
             cleanupListener();
 
-            setTimeout(() => {
-                const worldType = getWorldType();
-                handleWorldType(worldType);
-            }, 1000);
+            if (server.toLowerCase().includes('funtime')) {
+                setTimeout(() => {
+                    const worldType = getWorldType();
+
+                    if (worldType === 'Unknown') {
+                        setTimeout(() => {
+                            const retryWorldType = getWorldType();
+                            handleWorldType(retryWorldType);
+                        }, 2000);
+                    } else {
+                        handleWorldType(worldType);
+                    }
+                }, 1000);
+            } else {
+                setTimeout(() => {
+                    const worldType = getWorldType();
+                    handleWorldType(worldType);
+                }, 1000);
+            }
         }
     };
 
     function handleWorldType(worldType) {
         switch (worldType) {
             case 'Hub':
+                log('[AuthPlugin] Бот в лобби.');
                 inHub();
                 cleanupListener();
                 startHubInterval();
                 break;
 
             case 'Auth':
+                log('[AuthPlugin] Бот в мире авторизации.');
                 inAuth();
                 stopHubInterval();
-                cleanupListener();
-                messageListener = messageHandler;
-                bot.events.on('core:raw_message', messageListener);
+                if (!messageListener) {
+                    messageListener = messageHandler;
+                    bot.events.on('core:raw_message', messageListener);
+                }
                 break;
 
             case 'Portal':
+                if (hubCmd) {
+                    log(`[AuthPlugin] Бот зашел на портал (${hubCmd}).`);
+                } else {
+                    log('[AuthPlugin] Бот зашел на портал.');
+                }
                 inPortal();
                 stopHubInterval();
                 cleanupListener();
                 doPortalCmd();
                 break;
 
+            case 'Unknown':
+                stopHubInterval();
+                if (!messageListener) {
+                    messageListener = messageHandler;
+                    bot.events.on('core:raw_message', messageListener);
+                }
+                break;
+
             default:
-                log('[AuthPlugin] Неизвестный тип мира. Никаких действий не требуется.');
                 stopHubInterval();
                 cleanupListener();
                 break;
@@ -160,10 +211,14 @@ module.exports = (bot, options) => {
 
     bot.on('login', () => {
         setTimeout(() => {
-            cleanupListener();
             stopHubInterval();
 
             const worldType = getWorldType();
+
+            if (worldType !== 'Unknown') {
+                cleanupListener();
+            }
+
             handleWorldType(worldType);
         }, 1000);
     });
@@ -171,8 +226,7 @@ module.exports = (bot, options) => {
     bot.once('end', () => {
         cleanupListener();
         stopHubInterval();
-        log('[AuthPlugin] Бот отключается, все ресурсы плагина очищены.');
     });
 
-    log(`[AuthPlugin] Плагин загружен. Интервал хаба: ${hubIntervalSeconds} сек.`);
+    log('[AuthPlugin] Плагин загружен.');
 };
