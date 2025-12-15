@@ -14,7 +14,7 @@
       "mc.masedworld.net",
       "mc.dexland.org",
       "mc.cheatmine.net",
-      "mc.funtime.su"
+      "funtime.su"
     ],
     "settings": {
       "hubCmd": {
@@ -39,4 +39,5 @@
   }
 
 }
+
 
