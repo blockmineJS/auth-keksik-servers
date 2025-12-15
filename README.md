@@ -1,8 +1,8 @@
 # Плагин "auth-keksik-servers"
 
-![Совместимость](https://img.shields.io/badge/серверы-MineBlaze_|_MasedWorld_|_DexLand_|_CheatMine-orange)
+![Совместимость](https://img.shields.io/badge/серверы-MineBlaze_|_MasedWorld_|_DexLand_|_CheatMine_|_FunTime-orange)
 
-Плагин для автоматической регистрации/авторизации и захода на MineBlaze, MasedWorld, DexLand, CheatMine
+Плагин для автоматической регистрации/авторизации и захода на MineBlaze, MasedWorld, DexLand, CheatMine, FunTime
 
 ## Обзор
 
@@ -21,6 +21,7 @@
 -   `mc.masedworld.net`
 -   `mc.dexland.org`
 -   `mc.cheatmine.net`
+-   `mc.funtime.su`
 
 ## Установка
 
