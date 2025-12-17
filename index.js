@@ -26,14 +26,10 @@ module.exports = (bot, options) => {
         const levelType = bot.game.levelType;
 
         if (server.toLowerCase().includes('funtime')) {
-            if (levelType === 'flat') {
-                if (y === 100) {
-                    return 'Hub';
-                }
-                return 'Unknown';
-            } else {
-                return 'Portal';
+            if (y === 100) {
+                return 'Hub';
             }
+            return 'Portal';
         }
 
         if (difficulty === 'peaceful' && levelType === 'flat') {
