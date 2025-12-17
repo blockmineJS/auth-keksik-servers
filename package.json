@@ -1,6 +1,6 @@
 {
   "name": "auth-keksik-servers",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "author": "FurnyGo/merka/artemploxoy",
   "description": "Плагин для автоматической регистрации/авторизации и захода на портал на серверах MineBlaze, MasedWorld, DexLand, CheatMine, FunTime",
   "main": "index.js",

@@ -186,7 +186,6 @@ module.exports = (bot, options) => {
                 }
                 inPortal();
                 stopHubInterval();
-                cleanupListener();
                 doPortalCmd();
                 break;
 
@@ -223,6 +222,9 @@ module.exports = (bot, options) => {
         cleanupListener();
         stopHubInterval();
     });
+
+    messageListener = messageHandler;
+    bot.events.on('core:raw_message', messageListener);
 
     log('[AuthPlugin] Плагин загружен.');
 };
