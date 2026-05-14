@@ -15,6 +15,7 @@ module.exports = (bot, options) => {
 
     let messageListener = null;
     let hubInterval = null;
+    let globalCheckInterval = null;
 
     const loginPromptPattern = /(?:\||›|◊|✾|\[✾\])\s*(?:Авторизируйтесь|Введите пароль|Войдите в игру|Чтобы продолжить игру введите)/i;
     const registerPromptPattern = /(?:\||›|◊|✾|\[✾\])\s*(?:Зарегистрируйтесь|Создайте пароль)/i;
@@ -221,7 +222,31 @@ module.exports = (bot, options) => {
     bot.once('end', () => {
         cleanupListener();
         stopHubInterval();
+        if (globalCheckInterval) {
+            clearInterval(globalCheckInterval);
+            globalCheckInterval = null;
+        }
     });
+
+    globalCheckInterval = setInterval(() => {
+        if (!bot || !bot.entity) return;
+
+        const currentWorld = getWorldType();
+
+        if (currentWorld === 'Hub') {
+            log('[AuthPlugin] Бот застрял в лобби. Повторная отправка команды для портала...');
+            if (!hubInterval) {
+                handleWorldType('Hub');
+            } else {
+                doHubCmd(); 
+            }
+        } else if (currentWorld === 'Auth') {
+            if (!messageListener) {
+                log('[AuthPlugin] Бот застрял в мире авторизации. Перезапуск обработчика...');
+                handleWorldType('Auth');
+            }
+        }
+    }, 60000);
 
     messageListener = messageHandler;
     bot.events.on('core:raw_message', messageListener);
